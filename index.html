@@ -2,8 +2,11 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" id="viewport-meta" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <meta name="format-detection" content="telephone=no, email=no, address=no" />
+<script>
+/* Mobile viewport is fixed to device width to prevent Safari/WebView sudden zoom. */
+</script>
 <title>ACE · AI링커 설명회</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -30,7 +33,15 @@
   --content:min(1360px, calc(100vw - 56px));
 }
 *{box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden}
+html,body{
+  width:100%;
+  height:100%;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  /* iOS Safari: 가로 회전 시 글자 자동 확대 방지 */
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
 body{
   margin:0;
   color:var(--text);
@@ -42,6 +53,23 @@ body{
   font-family:'Noto Sans KR','Malgun Gothic',sans-serif;
   -webkit-font-smoothing:antialiased;
   word-break:keep-all;
+  /* iOS: bounce 스크롤로 인한 흰 영역 노출 방지 */
+  background-attachment:local;
+}
+/* iOS: 탭 강조 제거 */
+.tile,.nav-btn,.detail-btn,.detail-nav-btn,.brand-chip,button,a{
+  -webkit-tap-highlight-color:transparent;
+}
+/* iOS Safari notch 안전영역 보정 (가로 모드에서 좌측 notch 영역 회피) */
+@supports (padding: env(safe-area-inset-left)){
+  .topbar{
+    padding-left:env(safe-area-inset-left);
+    padding-right:env(safe-area-inset-right);
+  }
+  .detail-topbar{
+    padding-left:env(safe-area-inset-left);
+    padding-right:env(safe-area-inset-right);
+  }
 }
 a{color:inherit;text-decoration:none}
 button{font:inherit}
@@ -1887,371 +1915,767 @@ html, body,
 }
 
 
+/* R.72: mobile / Galaxy Fold unfolded responsive optimization */
+@supports (height: 100dvh){
+  html,body,.stage,.detail-root,.detail-stage{height:100dvh;}
+}
+@media(max-width:920px){
+  :root{--content:min(1360px, calc(100vw - 22px));}
+  html,body{overflow:hidden;}
+  body{background-size:96px 100%, 100% 96px;}
+  .topbar{top:10px;width:calc(100vw - 22px);}
+  .brand-chip{padding:9px 12px;}
+  .brand-chip img{width:19px;height:19px;}
+  .brand-copy strong{font-size:11px;line-height:1.1;}
+  .brand-copy span{font-size:10px;}
+  .hero-copy{top:86px;width:100%;}
+  .hero-title{font-size:clamp(42px,13vw,72px)!important;line-height:1.04!important;}
+  .hero-desc{font-size:clamp(16px,4.2vw,21px)!important;line-height:1.45!important;}
+  .hero-card{width:min(100%, 380px);height:auto;min-height:220px;padding:24px;bottom:34px;}
+  .hero-card strong{font-size:clamp(28px,8vw,40px)!important;}
+  .map-content{padding-top:76px;}
+  .map-head h2{font-size:clamp(38px,10vw,58px);line-height:.96;}
+  .map-head p{font-size:13px;line-height:1.35;}
+  .map-grid{max-height:calc(100dvh - 184px);overflow:auto;-webkit-overflow-scrolling:touch;padding-bottom:12px;}
+  .tile{padding:18px;min-height:168px!important;}
+  .tile h3{font-size:clamp(30px,7.4vw,42px)!important;}
+  .tile p{font-size:14px;}
+  .tile-art{opacity:.72;transform:scale(.86);transform-origin:right bottom;}
 
-/* MOBILE NO-BREAK PATCH v2
-   - 모바일에서는 16:9 고정 슬라이드를 억지로 압축하지 않고, 세로 스크롤형 카드로 전환
-   - 대표님 웰컴 메시지/첫 화면에서 텍스트 겹침과 잘림 방지
-*/
-@media (max-width: 820px){
-  html, body{
-    width:100% !important;
-    height:100% !important;
-    overflow:hidden !important;
+  .detail-topbar{top:10px;width:calc(100vw - 20px)!important;}
+  .detail-btn{padding:10px 12px!important;font-size:13px!important;}
+  .detail-deck-wrap{padding:62px 10px 84px!important;overflow:hidden!important;align-items:stretch!important;}
+  .detail-deck{
+    width:calc(100vw - 20px)!important;
+    height:calc(100dvh - 150px)!important;
+    max-height:none!important;
+    aspect-ratio:auto!important;
+    border-radius:22px!important;
+    overflow:hidden!important;
+  }
+  .detail-slide{align-items:stretch!important;}
+  .detail-stage .canvas{
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    padding:46px 24px 72px 32px!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior:contain!important;
+    border-radius:22px!important;
+  }
+  .detail-stage .canvas::-webkit-scrollbar{width:5px;}
+  .detail-stage .canvas::-webkit-scrollbar-track{background:rgba(0,0,0,.05);border-radius:999px;}
+  .detail-stage .canvas::-webkit-scrollbar-thumb{background:rgba(31,43,64,.26);border-radius:999px;}
+  .detail-stage .canvas:before{height:9px!important;}
+  .detail-stage .canvas:after{opacity:.045!important;}
+  .detail-stage .topline{gap:10px!important;margin-bottom:14px!important;}
+  .detail-stage .slide-no{font-size:12px!important;min-width:58px!important;padding:7px 10px!important;}
+  .detail-stage .kicker{font-size:12px!important;padding:6px 10px!important;margin-bottom:12px!important;letter-spacing:.04em!important;}
+  .detail-stage h1{font-size:clamp(34px,8.8vw,48px)!important;line-height:1.08!important;}
+  .detail-stage h2{font-size:clamp(28px,6.8vw,36px)!important;line-height:1.14!important;margin-bottom:12px!important;}
+  .detail-stage h3{font-size:clamp(19px,4.6vw,23px)!important;line-height:1.22!important;}
+  .detail-stage .lead,.detail-stage .sub{font-size:clamp(14.5px,3.6vw,17px)!important;line-height:1.5!important;}
+  .detail-stage .card{padding:16px!important;border-radius:18px!important;min-height:0!important;}
+  .detail-stage .card p,.detail-stage .card li,.detail-stage td,.detail-stage th{font-size:clamp(13.5px,3.2vw,15.5px)!important;line-height:1.45!important;}
+  .detail-stage .mini,.detail-stage .muted{font-size:clamp(12.5px,3vw,14px)!important;line-height:1.42!important;}
+  .detail-stage .icon{font-size:26px!important;margin-bottom:8px!important;}
+  .detail-stage .row,.detail-stage .row3,.detail-stage .row4,.detail-stage .reward,.detail-stage .qa,.detail-stage .flow{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:12px!important;
+    margin-top:14px!important;
+  }
+  .detail-stage .flow .arrow{display:none!important;}
+  .detail-stage .flow .node{height:auto!important;min-height:0!important;padding:16px!important;}
+  .detail-stage .flow .node p{font-size:14px!important;line-height:1.45!important;}
+  .detail-stage .role-count-chip{font-size:11.5px!important;margin-top:7px!important;padding:4px 9px!important;}
+  .detail-slide .row + .card,.detail-slide .row3 + .card{max-height:none!important;}
+  .detail-stage .table{font-size:13px!important;table-layout:fixed!important;}
+  .detail-stage .table th,.detail-stage .table td{padding:10px 8px!important;font-size:12.5px!important;line-height:1.34!important;word-break:keep-all!important;}
+  .detail-stage .mock-head{font-size:15px!important;padding:13px 16px!important;}
+  .detail-stage .mock-row{grid-template-columns:34px 1fr!important;gap:10px!important;padding:12px 16px!important;}
+  .detail-stage .badge{width:32px!important;height:32px!important;font-size:13px!important;}
+  .detail-stage .mock-val{font-size:16px!important;line-height:1.35!important;}
+  .detail-stage .mock-label{font-size:12px!important;}
+  .detail-stage .chapter-slide .canvas{padding:82px 26px 58px 32px!important;justify-content:center!important;}
+  .detail-stage .chapter-slide h1{font-size:clamp(36px,8vw,48px)!important;}
+  .detail-stage .chapter-slide .lead{font-size:clamp(16px,3.6vw,19px)!important;}
+  .detail-stage .chapter-slide .canvas:after{left:28px!important;top:26px!important;width:64px!important;height:64px!important;border-radius:18px!important;background-size:40px 40px!important;}
+  .detail-nav{bottom:10px;max-width:calc(100vw - 18px);gap:8px;padding:7px 9px!important;}
+  .detail-nav-btn{padding:9px 11px!important;font-size:12.5px!important;}
+  .detail-progress-bar{width:112px!important;height:6px!important;}
+  .detail-progress span{font-size:13px!important;min-width:50px!important;}
+}
+
+/* Galaxy Fold unfolded / compact tablet ratio */
+@media(min-width:600px) and (max-width:920px) and (min-height:700px){
+  .topbar{width:calc(100vw - 28px);}
+  .map-grid{grid-template-columns:1fr 1fr!important;grid-template-rows:auto!important;gap:10px;}
+  .tile.ceo,.tile.intro,.tile.linker,.tile.ace,.tile.faq{grid-row:auto!important;grid-column:auto!important;min-height:176px!important;}
+  .detail-deck-wrap{padding:64px 12px 84px!important;}
+  .detail-deck{width:calc(100vw - 24px)!important;height:calc(100dvh - 150px)!important;}
+  .detail-stage .canvas{padding:44px 30px 72px!important;}
+  .detail-stage h1{font-size:clamp(40px,6.4vw,54px)!important;}
+  .detail-stage h2{font-size:clamp(32px,5.2vw,42px)!important;}
+  .detail-stage h3{font-size:clamp(18px,2.9vw,23px)!important;}
+  .detail-stage .lead,.detail-stage .sub{font-size:clamp(15px,2.4vw,18px)!important;}
+  .detail-stage .card p,.detail-stage .card li{font-size:clamp(13.2px,2.05vw,15.5px)!important;}
+  .detail-stage .row,.detail-stage .reward,.detail-stage .qa{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .detail-stage .row3,.detail-stage .row4{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .detail-stage .flow{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;}
+  .detail-stage .flow .node{padding:14px!important;min-height:176px!important;}
+  .detail-stage .flow .node .icon{font-size:23px!important;margin-bottom:6px!important;}
+  .detail-stage .flow .node h3{font-size:19px!important;}
+  .detail-stage .flow .node span{font-size:11.5px!important;padding:4px 8px!important;}
+  .detail-stage .flow .node p{font-size:12.5px!important;line-height:1.42!important;margin-top:8px!important;}
+  .detail-stage .why-now-slide .row3{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
+  .detail-stage .why-now-slide .card{height:auto!important;min-height:218px!important;padding:14px!important;}
+  .detail-stage .why-now-slide .card p{font-size:12.8px!important;line-height:1.42!important;}
+  .detail-stage .ceo-message-layout{grid-template-columns:1fr 1fr!important;height:auto!important;min-height:0!important;}
+  .detail-stage .ceo-message-scroll{max-height:calc(100dvh - 320px)!important;}
+  .detail-stage .chapter-slide .canvas{padding:88px 42px 64px!important;}
+  .detail-progress-bar{width:170px!important;}
+}
+
+@media(max-width:599px){
+  .hero-card{left:0;right:0;width:100%;}
+  .map-grid{grid-template-columns:1fr!important;}
+  .detail-stage .topline{flex-direction:row!important;align-items:flex-start!important;}
+  .detail-stage .slide-no{transform:scale(.92);transform-origin:top right;}
+}
+
+/* === R.75: 모바일(<920px) 통합 재조정 ===
+   - 인라인 style의 grid-template-columns / 고정 height / overflow:hidden 을 모바일에서 무력화
+     하여 카드/그리드가 가로로 끊기거나 우측·하단이 잘리는 현상을 방지.
+   - 모든 다열 그리드는 1열로 reflow, 카드 높이는 auto, 가로 오버플로 차단.
+   - 폰트 사이즈는 JS에서 표준 사이즈로 통일(아래 normalizeMobileDetailLayout 참조). */
+@media (max-width:919px){
+  /* 가로 잘림 방지: 박스 모델 일관성 */
+  .detail-stage .canvas,
+  .detail-stage .canvas *{
+    box-sizing:border-box;
+    max-width:100%;
+  }
+  .detail-stage .canvas{
+    overflow-x:hidden!important;
+    word-break:keep-all;
+    overflow-wrap:anywhere;
+  }
+  /* 인라인 다열 그리드 → 1열 강제 */
+  .detail-stage .canvas [style*="grid-template-columns"]{
+    grid-template-columns:1fr!important;
+    grid-template-rows:auto!important;
+  }
+  /* 인라인 고정 height/min-height (60px↑) → auto */
+  .detail-stage .canvas [style*="height:1"],
+  .detail-stage .canvas [style*="height:2"],
+  .detail-stage .canvas [style*="height:3"],
+  .detail-stage .canvas [style*="height:4"],
+  .detail-stage .canvas [style*="height:5"],
+  .detail-stage .canvas [style*="height:6"],
+  .detail-stage .canvas [style*="height:7"],
+  .detail-stage .canvas [style*="height:8"],
+  .detail-stage .canvas [style*="height:9"],
+  .detail-stage .canvas [style*="min-height:1"],
+  .detail-stage .canvas [style*="min-height:2"],
+  .detail-stage .canvas [style*="min-height:3"]{
+    height:auto!important;
+    min-height:0!important;
+  }
+  /* 인라인 overflow:hidden → visible (잘림 방지) */
+  .detail-stage .canvas [style*="overflow:hidden"]{
+    overflow:visible!important;
+  }
+  /* 인라인 width 고정 → 100%로 */
+  .detail-stage .canvas [style*="width:1"][style*="px"]{
+    width:auto!important;
+    max-width:100%!important;
+  }
+  /* flex 가로 정렬 → 줄바꿈 허용 */
+  .detail-stage .canvas [style*="display:flex"]{
+    flex-wrap:wrap!important;
+  }
+  /* 표는 가로 스크롤 가능하도록 */
+  .detail-stage .table{
+    width:100%!important;
+    table-layout:fixed!important;
+    word-break:keep-all!important;
+  }
+  /* 카드/노드 컴팩트 */
+  .detail-stage .card{
+    padding:14px 16px!important;
+    min-height:0!important;
+    height:auto!important;
+  }
+  /* 슬라이드 본문 슬라이드 인디케이터/탑라인 균형 */
+  .detail-stage .topline{
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    gap:8px!important;
+  }
+  .detail-stage .slide-no{align-self:flex-end!important;margin-top:-28px!important;}
+}
+
+
+
+/* =========================================================
+   R.99 MOBILE NO-BREAK PATCH
+   - 모바일에서 16:9 데스크톱 슬라이드를 강제 축소/확대하지 않음
+   - 상세 슬라이드는 화면 폭에 맞춘 세로 스크롤 카드형으로 표시
+   - 표/2열/3열/4열 레이아웃은 1열로 접어 글자 겹침과 확대 현상 방지
+   ========================================================= */
+@media (max-width:900px){
+  html,body{
+    width:100%!important;
+    height:100%!important;
+    overflow:hidden!important;
+    -webkit-text-size-adjust:100%!important;
+    text-size-adjust:100%!important;
+    touch-action:manipulation;
+  }
+  body{
+    min-width:0!important;
+    background-size:92px 100%,100% 92px!important;
   }
 
-  /* 첫 화면 모바일 깨짐 방지 */
-  .stage{height:100dvh !important; overflow:hidden !important;}
-  .shell{width:calc(100vw - 24px) !important; height:100% !important;}
+  /* 첫 화면: 타이틀과 파란 카드가 겹치지 않도록 세로 흐름으로 전환 */
+  .stage{
+    width:100vw!important;
+    height:100dvh!important;
+    overflow:hidden!important;
+  }
+  .shell{
+    width:calc(100vw - 24px)!important;
+    height:100%!important;
+    min-width:0!important;
+  }
+  .hero-layer{
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    padding-bottom:42px!important;
+  }
   .hero-copy{
-    top:94px !important;
-    left:0 !important;
-    width:100% !important;
-    transform:none !important;
-    z-index:2 !important;
+    position:relative!important;
+    left:auto!important;
+    top:auto!important;
+    transform:none!important;
+    width:100%!important;
+    padding-top:112px!important;
   }
   .hero-title{
-    font-size:clamp(46px, 13.8vw, 68px) !important;
-    line-height:1.04 !important;
-    letter-spacing:-.065em !important;
+    font-size:clamp(44px,15.2vw,66px)!important;
+    line-height:1.02!important;
+    letter-spacing:-.065em!important;
   }
   .hero-desc{
-    margin-top:22px !important;
-    font-size:clamp(17px, 4.5vw, 21px) !important;
-    line-height:1.46 !important;
-    letter-spacing:-.04em !important;
-  }
-  .scroll-cue{
-    margin-top:20px !important;
-    font-size:14px !important;
+    margin-top:22px!important;
+    font-size:clamp(16px,4.4vw,19px)!important;
+    line-height:1.48!important;
   }
   .hero-card{
-    left:0 !important;
-    right:0 !important;
-    bottom:28px !important;
-    width:100% !important;
-    height:auto !important;
-    min-height:214px !important;
-    padding:24px !important;
-    transform:none !important;
-    z-index:1 !important;
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:auto!important;
+    transform:none!important;
+    width:100%!important;
+    max-width:none!important;
+    height:auto!important;
+    min-height:260px!important;
+    margin:26px 0 52px!important;
+    padding:26px!important;
   }
   .hero-card strong{
-    font-size:clamp(34px, 11.5vw, 50px) !important;
-    line-height:1.04 !important;
-    letter-spacing:-.07em !important;
+    font-size:clamp(34px,11.5vw,52px)!important;
+    line-height:1.04!important;
   }
-  .hero-card p{
-    font-size:13px !important;
-    line-height:1.55 !important;
-  }
+  .scroll-cue{margin-top:24px!important;}
 
-  /* 상세 슬라이드: 모바일에서는 한 장을 세로 문서처럼 표시 */
-  .detail-root.open,
-  .detail-root.visible{
-    width:100vw !important;
-    height:100dvh !important;
-    overflow:hidden !important;
+  /* 상세 화면 기본 골격 */
+  .detail-root.open{
+    overflow:hidden!important;
   }
   .detail-stage{
-    width:100vw !important;
-    height:100dvh !important;
-    overflow:hidden !important;
+    width:100vw!important;
+    height:100dvh!important;
+    overflow:hidden!important;
+    touch-action:pan-y!important;
   }
   .detail-topbar{
-    width:calc(100vw - 24px) !important;
-    top:calc(env(safe-area-inset-top, 0px) + 10px) !important;
-    z-index:60 !important;
+    position:fixed!important;
+    left:12px!important;
+    right:12px!important;
+    top:calc(10px + env(safe-area-inset-top,0px))!important;
+    width:auto!important;
+    transform:none!important;
+    z-index:80!important;
+    display:flex!important;
+    justify-content:space-between!important;
+    align-items:center!important;
+    gap:10px!important;
+    padding:0!important;
   }
   .detail-btn{
-    padding:11px 14px !important;
-    font-size:15px !important;
-    white-space:nowrap !important;
+    padding:12px 16px!important;
+    min-height:46px!important;
+    border-radius:999px!important;
+    font-size:17px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
   }
+  .detail-center{display:none!important;}
   .detail-deck-wrap{
-    position:absolute !important;
-    inset:0 !important;
-    display:block !important;
-    place-items:initial !important;
-    padding:calc(env(safe-area-inset-top, 0px) + 70px) 12px calc(env(safe-area-inset-bottom, 0px) + 92px) !important;
-    overflow-x:hidden !important;
-    overflow-y:auto !important;
-    -webkit-overflow-scrolling:touch !important;
+    position:absolute!important;
+    inset:0!important;
+    display:block!important;
+    place-items:unset!important;
+    overflow:hidden!important;
+    padding:calc(74px + env(safe-area-inset-top,0px)) 10px calc(104px + env(safe-area-inset-bottom,0px))!important;
   }
-  .detail-deck,
-  .detail-deck:focus,
-  .detail-deck:active,
-  .detail-deck:hover{
-    position:relative !important;
-    width:100% !important;
-    height:auto !important;
-    min-height:calc(100dvh - 172px) !important;
-    max-height:none !important;
-    aspect-ratio:auto !important;
-    overflow:visible !important;
-    transform:none !important;
-    filter:none !important;
-    border-radius:22px !important;
+  .detail-deck{
+    position:relative!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:none!important;
+    max-height:none!important;
+    min-width:0!important;
+    aspect-ratio:auto!important;
+    overflow:hidden!important;
+    border-radius:20px!important;
+    filter:none!important;
   }
   .detail-slide{
-    position:relative !important;
-    inset:auto !important;
-    display:none !important;
-    width:100% !important;
-    min-height:0 !important;
-    opacity:1 !important;
-    transform:none !important;
-    pointer-events:none !important;
-    transition:none !important;
+    position:absolute!important;
+    inset:0!important;
+    display:block!important;
+    place-items:unset!important;
+    opacity:0!important;
+    pointer-events:none!important;
+    overflow:hidden!important;
+    transform:translateX(108%)!important;
+    transition:opacity .24s ease, transform .24s ease!important;
   }
-  .detail-slide.active,
-  .detail-slide.active:focus,
-  .detail-slide.active:focus-within,
-  .detail-slide.active:active,
-  .detail-slide.active:hover{
-    display:block !important;
-    opacity:1 !important;
-    transform:none !important;
-    pointer-events:auto !important;
+  .detail-slide.active{
+    opacity:1!important;
+    pointer-events:auto!important;
+    transform:translateX(0)!important;
   }
+  .detail-slide.prev{transform:translateX(-108%)!important;}
+
+  /* 캔버스: 모바일에서는 고정 슬라이드가 아니라 내부 스크롤 문서 */
   .detail-stage .canvas,
-  .detail-stage .canvas:focus,
-  .detail-stage .canvas:active,
-  .detail-stage .canvas:hover{
-    width:100% !important;
-    height:auto !important;
-    min-height:calc(100dvh - 172px) !important;
-    aspect-ratio:auto !important;
-    overflow:visible !important;
-    transform:none !important;
-    transform-origin:top center !important;
-    padding:42px 20px 34px 26px !important;
-    border-radius:22px !important;
-    display:flex !important;
-    flex-direction:column !important;
+  .detail-stage .hero-bg{
+    position:relative!important;
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:100%!important;
+    max-height:none!important;
+    aspect-ratio:auto!important;
+    transform:none!important;
+    transform-origin:initial!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior:contain!important;
+    border-radius:20px!important;
+    padding:30px 18px 128px!important;
   }
-  .detail-stage .canvas:after{
-    width:220px !important;
-    height:220px !important;
-    right:-96px !important;
-    bottom:-96px !important;
+  .detail-stage .chapter-slide .canvas,
+  .detail-stage .chapter-slide .hero-bg{
+    padding:82px 22px 128px!important;
   }
+  .detail-stage .canvas:before{height:8px!important;width:100%!important;}
+  .detail-stage .canvas:after{display:none!important;}
+  .detail-stage .canvas *,
+  .detail-stage .hero-bg *{
+    box-sizing:border-box!important;
+    max-width:100%!important;
+    min-width:0!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+    word-break:keep-all!important;
+  }
+
+  /* 상단 제목부 */
   .detail-stage .topline{
-    display:flex !important;
-    align-items:flex-start !important;
-    justify-content:space-between !important;
-    gap:10px !important;
-    margin-bottom:16px !important;
+    display:block!important;
+    margin:0 0 18px!important;
+    gap:0!important;
   }
-  .detail-stage .kicker{
-    max-width:100% !important;
-    font-size:12px !important;
-    line-height:1.18 !important;
-    letter-spacing:.06em !important;
-    padding:7px 10px !important;
-    margin-bottom:12px !important;
-    white-space:normal !important;
+  .detail-stage .slide-no{
+    position:absolute!important;
+    top:18px!important;
+    right:18px!important;
+    min-width:0!important;
+    padding:7px 10px!important;
+    font-size:12px!important;
+    line-height:1!important;
+    z-index:5!important;
+  }
+  .detail-stage .kicker,
+  .detail-slide .kicker,
+  .chapter-slide .kicker{
+    width:auto!important;
+    max-width:calc(100% - 82px)!important;
+    margin:0 0 16px!important;
+    padding:7px 10px!important;
+    font-size:11.5px!important;
+    line-height:1.18!important;
+    letter-spacing:.08em!important;
   }
   .detail-stage h1,
+  .detail-stage .chapter-slide h1,
+  .detail-slide h1,
   .chapter-slide h1{
-    font-size:clamp(38px, 12vw, 50px) !important;
-    line-height:1.08 !important;
-    letter-spacing:-.065em !important;
+    font-size:clamp(30px,9vw,42px)!important;
+    line-height:1.08!important;
+    letter-spacing:-.065em!important;
+    margin:0!important;
   }
-  .detail-stage h2{
-    font-size:clamp(30px, 9.2vw, 38px) !important;
-    line-height:1.12 !important;
-    letter-spacing:-.06em !important;
-    margin-bottom:12px !important;
+  .detail-stage h2,
+  .detail-slide h2{
+    font-size:clamp(26px,7.4vw,34px)!important;
+    line-height:1.12!important;
+    letter-spacing:-.055em!important;
+    margin:0 0 16px!important;
   }
-  .detail-stage .big{
-    font-size:clamp(44px, 13vw, 62px) !important;
-    line-height:1.05 !important;
+  .detail-stage h3,
+  .detail-slide h3{
+    font-size:clamp(20px,5.2vw,25px)!important;
+    line-height:1.24!important;
+    letter-spacing:-.045em!important;
   }
   .detail-stage .lead,
   .detail-stage .sub{
-    font-size:clamp(16px, 4.7vw, 21px) !important;
-    line-height:1.48 !important;
+    font-size:clamp(15px,4.1vw,18px)!important;
+    line-height:1.55!important;
   }
-  .detail-stage .slide-no{
-    min-width:auto !important;
-    flex-shrink:0 !important;
-    padding:7px 10px !important;
-    font-size:12px !important;
+  .detail-stage p,
+  .detail-stage li,
+  .detail-stage td,
+  .detail-stage th,
+  .detail-stage .check,
+  .detail-stage .a{
+    font-size:clamp(14px,3.75vw,16.5px)!important;
+    line-height:1.5!important;
   }
+  .detail-stage .muted,
+  .detail-stage .mini{
+    font-size:clamp(13px,3.4vw,15px)!important;
+    line-height:1.48!important;
+  }
+  .detail-stage .pill,
+  .detail-stage .tag{
+    width:max-content!important;
+    max-width:100%!important;
+    font-size:12px!important;
+    line-height:1.18!important;
+    padding:7px 10px!important;
+  }
+
+  /* 모든 다열/가로 배치 → 1열 */
   .detail-stage .row,
   .detail-stage .row3,
   .detail-stage .row4,
   .detail-stage .reward,
   .detail-stage .qa,
-  .detail-stage .flow{
-    display:grid !important;
-    grid-template-columns:1fr !important;
-    gap:12px !important;
+  .detail-stage .flow,
+  .detail-stage .ceo-message-layout,
+  .detail-stage .role-grid,
+  .detail-stage .linker-grid,
+  .detail-stage .ai-linker-grid{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    grid-template-rows:auto!important;
+    gap:14px!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    margin-top:16px!important;
+    align-items:stretch!important;
   }
-  .detail-stage .card{
-    padding:16px !important;
-    border-radius:18px !important;
-    overflow:visible !important;
-    min-height:0 !important;
-    height:auto !important;
+  .detail-stage .card,
+  .detail-stage .month,
+  .detail-stage .node,
+  .detail-stage .qcard,
+  .detail-stage .mock,
+  .detail-stage .case,
+  .detail-stage .tbox{
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+    padding:18px!important;
+    border-radius:18px!important;
   }
-  .detail-stage .card h3{
-    font-size:clamp(21px, 6vw, 26px) !important;
-    line-height:1.2 !important;
+  .detail-stage .card h3{margin:10px 0 10px!important;}
+  .detail-stage .card p{margin:0!important;}
+  .detail-stage .card ul{
+    margin-top:12px!important;
+    padding-left:18px!important;
+    gap:8px!important;
   }
-  .detail-stage .card p,
-  .detail-stage .card li,
-  .detail-stage .check,
-  .detail-stage .q,
-  .detail-stage .a{
-    font-size:15px !important;
-    line-height:1.48 !important;
+  .detail-stage .checklist{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:10px!important;
+    height:auto!important;
+    min-height:0!important;
+    margin-top:12px!important;
   }
-  .detail-stage .muted,
-  .detail-stage .mini{
-    font-size:13.5px !important;
-    line-height:1.42 !important;
+  .detail-stage .check{
+    display:flex!important;
+    align-items:flex-start!important;
+    gap:10px!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    padding:14px!important;
+    overflow:visible!important;
+  }
+  .detail-stage .mark,
+  .detail-stage .badge{
+    flex:0 0 auto!important;
+    width:28px!important;
+    height:28px!important;
+    font-size:14px!important;
+  }
+
+  /* 표는 모바일에서 카드형 행으로 변환 */
+  .detail-stage .table,
+  .detail-stage .table tbody,
+  .detail-stage .table tr,
+  .detail-stage .table td,
+  .detail-stage .table th{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    height:auto!important;
+    table-layout:auto!important;
   }
   .detail-stage .table{
-    min-width:720px !important;
+    border:0!important;
+    box-shadow:none!important;
+    border-radius:0!important;
+    background:transparent!important;
+    margin-top:12px!important;
   }
-  .detail-stage .footer{
-    position:static !important;
-    margin-top:24px !important;
+  .detail-stage .table tr{
+    margin:0 0 10px!important;
+    border:1px solid rgba(0,0,0,.08)!important;
+    border-radius:16px!important;
+    overflow:hidden!important;
+    background:rgba(255,255,255,.88)!important;
+  }
+  .detail-stage .table td,
+  .detail-stage .table th{
+    border:0!important;
+    padding:12px 14px!important;
+    text-align:left!important;
+    vertical-align:top!important;
+  }
+  .detail-stage .table td:first-child{
+    width:100%!important;
+    text-align:left!important;
+    background:var(--detail-tint)!important;
+    font-weight:900!important;
+    border-bottom:1px solid rgba(0,0,0,.07)!important;
   }
 
-  /* 챕터 커버 슬라이드 */
-  .detail-stage .chapter-slide .canvas{
-    min-height:calc(100dvh - 172px) !important;
-    padding:82px 24px 48px 30px !important;
-    justify-content:center !important;
-  }
-  .detail-stage .chapter-slide .canvas:after{
-    left:28px !important;
-    top:28px !important;
-    width:62px !important;
-    height:62px !important;
-    border-radius:18px !important;
-    background-size:38px 38px !important;
-  }
-  .detail-stage .chapter-slide .lead{
-    margin-top:18px !important;
-    font-size:clamp(17px, 4.7vw, 21px) !important;
-  }
-
-  /* 대표님 웰컴 메시지: 전문 카드와 핵심 메시지가 겹치지 않도록 별도 모바일 레이아웃 */
+  /* 대표님 메시지 / 긴 본문 */
   .detail-stage .ceo-message-slide .canvas{
-    padding:42px 18px 34px 24px !important;
-    min-height:calc(100dvh - 172px) !important;
-  }
-  .detail-stage .ceo-message-slide .topline{
-    margin-bottom:12px !important;
-  }
-  .detail-stage .ceo-message-slide h2{
-    font-size:clamp(31px, 9.4vw, 39px) !important;
-    line-height:1.1 !important;
+    padding:30px 18px 128px!important;
   }
   .detail-stage .ceo-message-layout{
-    display:grid !important;
-    grid-template-columns:1fr !important;
-    gap:12px !important;
-    align-items:start !important;
-    height:auto !important;
-    min-height:0 !important;
-    margin-top:8px !important;
+    height:auto!important;
+    min-height:0!important;
   }
-  .detail-stage .ceo-message-card{
-    height:auto !important;
-    min-height:0 !important;
-    display:block !important;
-  }
+  .detail-stage .ceo-message-card,
   .detail-stage .ceo-message-scroll{
-    height:auto !important;
-    min-height:0 !important;
-    max-height:34dvh !important;
-    overflow-y:auto !important;
-    overscroll-behavior:contain !important;
-    padding:18px 16px !important;
-    font-size:14px !important;
-    line-height:1.58 !important;
-  }
-  .detail-stage .ceo-message-scroll .ceo-message-label{
-    font-size:13px !important;
-    margin-bottom:10px !important;
+    height:auto!important;
+    max-height:none!important;
+    min-height:0!important;
+    overflow:visible!important;
   }
   .detail-stage .ceo-message-scroll p{
-    font-size:14px !important;
-    line-height:1.58 !important;
-    margin:0 0 10px !important;
-  }
-  .detail-stage .ceo-message-slide .checklist{
-    height:auto !important;
-    min-height:0 !important;
-    display:grid !important;
-    grid-template-columns:1fr !important;
-    gap:8px !important;
-    justify-content:initial !important;
-  }
-  .detail-stage .ceo-message-slide .check{
-    flex:none !important;
-    min-height:0 !important;
-    padding:12px !important;
-    gap:10px !important;
-    align-items:flex-start !important;
-  }
-  .detail-stage .ceo-message-slide .mark{
-    width:30px !important;
-    height:30px !important;
-    font-size:15px !important;
-    flex:0 0 30px !important;
-  }
-  .detail-stage .ceo-message-slide .check b{
-    font-size:16px !important;
-    line-height:1.25 !important;
-  }
-  .detail-stage .ceo-message-slide .check .muted{
-    font-size:13px !important;
-    line-height:1.36 !important;
+    font-size:14.5px!important;
+    line-height:1.62!important;
   }
 
-  /* 하단 네비게이션이 본문을 덮지 않도록 고정 폭/안전영역 처리 */
+  /* 하단 네비게이션: 내용 위를 과하게 가리지 않도록 높이/폭 보정 */
   .detail-nav{
-    left:12px !important;
-    right:12px !important;
-    bottom:calc(env(safe-area-inset-bottom, 0px) + 10px) !important;
-    transform:none !important;
-    width:auto !important;
-    justify-content:space-between !important;
-    gap:8px !important;
-    padding:8px 10px !important;
+    position:fixed!important;
+    left:10px!important;
+    right:10px!important;
+    bottom:calc(10px + env(safe-area-inset-bottom,0px))!important;
+    transform:none!important;
+    width:auto!important;
+    max-width:none!important;
+    z-index:90!important;
+    display:flex!important;
+    justify-content:space-between!important;
+    align-items:center!important;
+    gap:8px!important;
+    padding:8px 10px!important;
+    border-radius:26px!important;
   }
   .detail-nav-btn{
-    padding:10px 13px !important;
-    font-size:14px !important;
-    white-space:nowrap !important;
+    flex:0 0 auto!important;
+    padding:12px 16px!important;
+    min-width:86px!important;
+    font-size:16px!important;
+    line-height:1!important;
+    border-radius:999px!important;
   }
   .detail-progress{
-    gap:8px !important;
-    min-width:0 !important;
+    flex:1 1 auto!important;
+    min-width:0!important;
+    justify-content:center!important;
+    gap:8px!important;
   }
   .detail-progress-bar{
-    width:86px !important;
+    width:min(112px,26vw)!important;
+    height:8px!important;
   }
   .detail-progress span{
-    min-width:44px !important;
-    font-size:14px !important;
+    min-width:44px!important;
+    font-size:17px!important;
+    line-height:1!important;
+  }
+
+  /* 링크 버튼/알약 요소 줄바꿈 */
+  .detail-stage a.link-btn,
+  .detail-stage a[style*="border-radius:999px"],
+  .detail-stage a[style*="border-radius: 999px"]{
+    width:100%!important;
+    margin-top:10px!important;
+    justify-content:center!important;
+    flex-shrink:1!important;
+    font-size:14px!important;
+    padding:12px 14px!important;
+    white-space:normal!important;
+    text-align:center!important;
   }
 }
 
-@media (max-width: 390px){
-  .hero-title{font-size:clamp(42px, 13vw, 60px) !important;}
-  .hero-card{min-height:196px !important;padding:22px !important;}
-  .hero-card strong{font-size:clamp(31px, 10.8vw, 44px) !important;}
-  .detail-stage .canvas{padding-left:22px !important;padding-right:16px !important;}
-  .detail-stage h2{font-size:clamp(28px, 8.8vw, 35px) !important;}
-  .detail-stage .ceo-message-scroll{max-height:32dvh !important;}
-}
 
+/* R.100 MOBILE SPECIFICITY FIX: slide-specific desktop rules above use !important; these selectors intentionally outrank them. */
+@media (max-width:900px){
+  body .detail-root.open .detail-stage .detail-deck-wrap{
+    padding:calc(74px + env(safe-area-inset-top,0px)) 10px calc(104px + env(safe-area-inset-bottom,0px))!important;
+  }
+  body .detail-root.open .detail-stage .detail-slide.active .canvas,
+  body .detail-root.open .detail-stage .detail-slide.active .hero-bg,
+  body .detail-root.open .detail-stage .ace-meeting-slide.detail-slide.active .canvas,
+  body .detail-root.open .detail-stage .ceo-message-slide.detail-slide.active .canvas{
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    aspect-ratio:auto!important;
+    transform:none!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    padding:30px 18px 128px!important;
+    border-radius:20px!important;
+    display:block!important;
+  }
+  body .detail-root.open .detail-stage .chapter-slide.detail-slide.active .canvas{
+    padding:82px 22px 128px!important;
+  }
+  body .detail-root.open .detail-stage .detail-slide.active .row,
+  body .detail-root.open .detail-stage .detail-slide.active .row3,
+  body .detail-root.open .detail-stage .detail-slide.active .row4,
+  body .detail-root.open .detail-stage .detail-slide.active .flow,
+  body .detail-root.open .detail-stage .detail-slide.active .reward,
+  body .detail-root.open .detail-stage .detail-slide.active .qa,
+  body .detail-root.open .detail-stage .detail-slide.active [style*="grid-template-columns"]{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    grid-template-rows:auto!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    gap:14px!important;
+    margin-top:16px!important;
+    align-items:stretch!important;
+  }
+  body .detail-root.open .detail-stage .detail-slide.active .card,
+  body .detail-root.open .detail-stage .detail-slide.active .month,
+  body .detail-root.open .detail-stage .detail-slide.active .node,
+  body .detail-root.open .detail-stage .detail-slide.active .qcard,
+  body .detail-root.open .detail-stage .ace-meeting-slide.detail-slide.active .card{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+    padding:18px!important;
+    border-radius:18px!important;
+  }
+  body .detail-root.open .detail-stage .detail-slide.active .check,
+  body .detail-root.open .detail-stage .ace-meeting-slide.detail-slide.active .check{
+    display:grid!important;
+    grid-template-columns:32px minmax(0,1fr)!important;
+    align-items:flex-start!important;
+    gap:10px!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    padding:14px!important;
+  }
+  body .detail-root.open .detail-stage .detail-slide.active .check > div:not(.mark){
+    width:auto!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+  body .detail-root.open .detail-stage .detail-slide.active .table,
+  body .detail-root.open .detail-stage .detail-slide.active .table tbody,
+  body .detail-root.open .detail-stage .detail-slide.active .table tr,
+  body .detail-root.open .detail-stage .detail-slide.active .table td,
+  body .detail-root.open .detail-stage .detail-slide.active .table th{
+    display:block!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    height:auto!important;
+    table-layout:auto!important;
+    white-space:normal!important;
+  }
+  body .detail-root.open .detail-stage .detail-slide.active .table td,
+  body .detail-root.open .detail-stage .detail-slide.active .table th{
+    text-align:left!important;
+    vertical-align:top!important;
+    padding:12px 14px!important;
+  }
+  body .detail-root.open .detail-stage .detail-slide.active h2{
+    font-size:clamp(26px,7.4vw,34px)!important;
+    line-height:1.12!important;
+    margin:0 0 16px!important;
+  }
+  body .detail-root.open .detail-stage .detail-slide.active h3{
+    font-size:clamp(20px,5.2vw,25px)!important;
+    line-height:1.24!important;
+  }
+  body .detail-root.open .detail-stage .detail-slide.active p,
+  body .detail-root.open .detail-stage .detail-slide.active li,
+  body .detail-root.open .detail-stage .detail-slide.active td,
+  body .detail-root.open .detail-stage .detail-slide.active th{
+    font-size:clamp(14px,3.75vw,16.5px)!important;
+    line-height:1.5!important;
+  }
+}
 </style>
 </head>
 <body>
@@ -2639,6 +3063,81 @@ function renderSlides(key){
   currentSlide = 0;
   updateDetailSlides();
 }
+
+function normalizeMobileDetailLayout(){
+  // 사용자 요청에 따라 모바일 reflow 비활성화 - PC 디자인 그대로 좌우/세로 스크롤로 표시.
+  // 혹시라도 이전에 인라인으로 박혔던 모바일 스타일이 남아 있으면 한 번씩 제거해 둔다.
+  const active = detailDeck.querySelector('.detail-slide.active');
+  if(!active) return;
+  const canvas = active.querySelector('.canvas');
+  if(canvas){
+    canvas.style.removeProperty('overflow-y');
+    canvas.style.removeProperty('overflow-x');
+    canvas.style.removeProperty('-webkit-overflow-scrolling');
+  }
+  return;
+  /* eslint-disable */
+  /* === 이하 코드는 더 이상 실행되지 않습니다(상단에서 즉시 return).
+        과거 모바일 reflow 로직 — 회귀 시 참고용으로만 유지. ===  */
+  const isMobile = false;
+  if(!isMobile) return;
+
+  // 화면 폭에 따라 본문 표준 폰트 사이즈를 단계화 (cap이 아니라 강제 통일)
+  const w = window.innerWidth;
+  const sizes = (w >= 720) ? {
+    h1: 44, h2: 30, h3: 20, lead: 17, p: 15, mini: 13, chip: 12, icon: 26
+  } : (w >= 480) ? {
+    h1: 36, h2: 26, h3: 18.5, lead: 15.5, p: 14, mini: 12.5, chip: 11.5, icon: 24
+  } : {
+    h1: 30, h2: 22, h3: 17, lead: 14.5, p: 13.5, mini: 12, chip: 11, icon: 22
+  };
+
+  // 1) 인라인 style 정규화: 다열 그리드 → 1열, 고정 height → auto, overflow:hidden → visible
+  active.querySelectorAll('[style]').forEach(el=>{
+    const raw = el.getAttribute('style') || '';
+    if(/grid-template-columns\s*:/i.test(raw)){
+      el.style.setProperty('grid-template-columns','1fr','important');
+      el.style.setProperty('grid-template-rows','auto','important');
+    }
+    if(/height\s*:\s*(\d{2,})px/i.test(raw) || /min-height\s*:\s*(\d{2,})px/i.test(raw)){
+      const m1 = raw.match(/(?:^|;|\s)height\s*:\s*(\d{2,})px/i);
+      const m2 = raw.match(/min-height\s*:\s*(\d{2,})px/i);
+      const h = Math.max(m1 ? parseInt(m1[1],10) : 0, m2 ? parseInt(m2[1],10) : 0);
+      if(h >= 60){
+        el.style.setProperty('height','auto','important');
+        el.style.setProperty('min-height','0','important');
+      }
+    }
+    if(/overflow\s*:\s*hidden/i.test(raw) && !el.matches('.canvas')){
+      el.style.setProperty('overflow','visible','important');
+    }
+    // flex 가로 정렬은 줄바꿈 허용
+    if(/display\s*:\s*flex/i.test(raw) && el.children && el.children.length > 1){
+      el.style.setProperty('flex-wrap','wrap','important');
+    }
+    // 인라인 width:NNNpx 고정 → max-width로
+    if(/(?:^|;|\s)width\s*:\s*\d{2,}px/i.test(raw)){
+      el.style.setProperty('max-width','100%','important');
+    }
+  });
+
+  // 2) 폰트 사이즈 표준화 (모든 텍스트를 폭별 표준 사이즈로 강제)
+  active.querySelectorAll('h1').forEach(el => el.style.setProperty('font-size', sizes.h1 + 'px', 'important'));
+  active.querySelectorAll('h2').forEach(el => el.style.setProperty('font-size', sizes.h2 + 'px', 'important'));
+  active.querySelectorAll('h3').forEach(el => el.style.setProperty('font-size', sizes.h3 + 'px', 'important'));
+  active.querySelectorAll('.lead, .sub').forEach(el => el.style.setProperty('font-size', sizes.lead + 'px', 'important'));
+  active.querySelectorAll('p, li, td, th').forEach(el => el.style.setProperty('font-size', sizes.p + 'px', 'important'));
+  active.querySelectorAll('.mini, .muted').forEach(el => el.style.setProperty('font-size', sizes.mini + 'px', 'important'));
+  active.querySelectorAll('.pill, .kicker, .slide-no, .tag, .role-count-chip').forEach(el => el.style.setProperty('font-size', sizes.chip + 'px', 'important'));
+  active.querySelectorAll('.icon').forEach(el => el.style.setProperty('font-size', sizes.icon + 'px', 'important'));
+
+  // 3) 하단 PlayGround/링크 알약 버튼은 잘리지 않도록 폰트 살짝만 축소
+  active.querySelectorAll('a[style*="border-radius:999px"], a[style*="border-radius: 999px"]').forEach(el=>{
+    el.style.setProperty('font-size', sizes.chip + 'px', 'important');
+    el.style.setProperty('padding','9px 14px','important');
+  });
+}
+
 function updateDetailSlides(){
   const slides = [...detailDeck.querySelectorAll('.detail-slide')];
   const total = slides.length || 1;
@@ -2652,7 +3151,9 @@ function updateDetailSlides(){
   detailNext.disabled = currentSlide >= total - 1;
   detailCount.textContent = (currentSlide + 1) + ' / ' + total;
   detailProgressFill.style.width = ((currentSlide + 1) / total * 100) + '%';
+  normalizeMobileDetailLayout();
 }
+
 function moveDetail(delta){
   const total = detailDeck.querySelectorAll('.detail-slide').length;
   if(!total) return;
@@ -2754,8 +3255,128 @@ detailNext.addEventListener('click', ()=>moveDetail(1));
   }
   window.addEventListener('load', fitActiveSlide);
   window.addEventListener('resize', fitActiveSlide);
+  window.addEventListener('resize', function(){ setTimeout(normalizeMobileDetailLayout, 0); });
   document.addEventListener('keydown', function(){ setTimeout(fitActiveSlide, 0); });
   document.addEventListener('click', function(){ setTimeout(fitActiveSlide, 0); }, true);
+
+  // 모바일(<920px) ↔ 데스크탑(≥920px) 전환 시,
+  // 모바일 모드에서 JS가 인라인으로 추가했던 폰트/높이 정규화를 정리하기 위해
+  // 현재 슬라이드를 그대로 재렌더링한다(현재 페이지 인덱스는 유지).
+  var _prevMobileMode = window.matchMedia('(max-width:919px)').matches;
+  function handleFoldModeChange(){
+    var isNowMobile = window.matchMedia('(max-width:919px)').matches;
+    if(_prevMobileMode !== isNowMobile && currentKey && detailRoot.classList.contains('open')){
+      var savedIdx = currentSlide;
+      detailDeck.innerHTML = detailData[currentKey].slides.join('');
+      currentSlide = savedIdx;
+      var slides = [].slice.call(detailDeck.querySelectorAll('.detail-slide'));
+      slides.forEach(function(s, i){
+        s.classList.toggle('active', i === currentSlide);
+        s.classList.toggle('prev', i < currentSlide);
+        var no = s.querySelector('.slide-no');
+        if(no) no.textContent = (i + 1) + ' / ' + slides.length;
+      });
+      setTimeout(fitActiveSlide, 0);
+      setTimeout(normalizeMobileDetailLayout, 0);
+    }
+    _prevMobileMode = isNowMobile;
+  }
+  window.addEventListener('resize', handleFoldModeChange);
+  window.addEventListener('orientationchange', handleFoldModeChange);
+})();
+</script>
+
+
+<script>
+/* R.99 MOBILE NO-BREAK PATCH SCRIPT */
+(function(){
+  function isMobile(){ return window.matchMedia && window.matchMedia('(max-width:900px)').matches; }
+  function setSafeViewport(){
+    var meta = document.getElementById('viewport-meta') || document.querySelector('meta[name="viewport"]');
+    if(meta){
+      meta.setAttribute('content','width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+    }
+  }
+  function hardenMobileSlide(){
+    setSafeViewport();
+    var active = document.querySelector('.detail-slide.active');
+    if(!active || !isMobile()) return;
+    var canvas = active.querySelector('.canvas');
+    if(canvas){
+      canvas.style.setProperty('transform','none','important');
+      canvas.style.setProperty('overflow-y','auto','important');
+      canvas.style.setProperty('overflow-x','hidden','important');
+      canvas.style.setProperty('height','100%','important');
+      canvas.style.setProperty('min-height','0','important');
+      canvas.scrollLeft = 0;
+    }
+
+    active.querySelectorAll('[style]').forEach(function(el){
+      var raw = el.getAttribute('style') || '';
+      // 인라인 2열/3열/4열 grid는 모바일에서 반드시 1열로 접는다.
+      if(/grid-template-columns\s*:/i.test(raw) || /display\s*:\s*grid/i.test(raw)){
+        el.style.setProperty('display','grid','important');
+        el.style.setProperty('grid-template-columns','1fr','important');
+        el.style.setProperty('grid-template-rows','auto','important');
+        el.style.setProperty('gap','14px','important');
+      }
+      // 가로 flex 묶음은 줄바꿈 허용. 버튼 묶음도 겹치지 않게 한다.
+      if(/display\s*:\s*flex/i.test(raw)){
+        el.style.setProperty('flex-wrap','wrap','important');
+        el.style.setProperty('align-items','flex-start','important');
+      }
+      // 고정 높이/100% 높이 때문에 내용이 겹치는 요소 정리. 캔버스 자체는 제외.
+      if(!el.classList.contains('canvas') && /(?:^|;|\s)(height|min-height|max-height)\s*:/i.test(raw)){
+        el.style.setProperty('height','auto','important');
+        el.style.setProperty('min-height','0','important');
+        el.style.setProperty('max-height','none','important');
+      }
+      if(!el.classList.contains('canvas') && /overflow\s*:\s*hidden/i.test(raw)){
+        el.style.setProperty('overflow','visible','important');
+      }
+      if(/(?:^|;|\s)width\s*:\s*\d{2,}px/i.test(raw)){
+        el.style.setProperty('width','100%','important');
+        el.style.setProperty('max-width','100%','important');
+      }
+      el.style.setProperty('min-width','0','important');
+      el.style.setProperty('max-width','100%','important');
+      el.style.setProperty('white-space','normal','important');
+      el.style.setProperty('overflow-wrap','anywhere','important');
+    });
+
+    // 표는 JS에서도 한 번 더 안전 처리한다.
+    active.querySelectorAll('table.table').forEach(function(table){
+      table.style.setProperty('display','block','important');
+      table.style.setProperty('width','100%','important');
+      table.style.setProperty('min-width','0','important');
+      table.style.setProperty('height','auto','important');
+      table.style.setProperty('table-layout','auto','important');
+      table.querySelectorAll('tbody,tr,td,th').forEach(function(cell){
+        cell.style.setProperty('display','block','important');
+        cell.style.setProperty('width','100%','important');
+        cell.style.setProperty('height','auto','important');
+        cell.style.setProperty('min-width','0','important');
+        cell.style.setProperty('max-width','100%','important');
+        cell.style.setProperty('white-space','normal','important');
+      });
+    });
+  }
+
+  // 기존 normalizeMobileDetailLayout을 모바일 안전 처리 함수로 교체한다.
+  window.normalizeMobileDetailLayout = hardenMobileSlide;
+
+  function delayed(){
+    setSafeViewport();
+    hardenMobileSlide();
+    setTimeout(hardenMobileSlide, 60);
+    setTimeout(hardenMobileSlide, 220);
+  }
+  window.addEventListener('DOMContentLoaded', delayed);
+  window.addEventListener('load', delayed);
+  window.addEventListener('resize', delayed);
+  window.addEventListener('orientationchange', delayed);
+  document.addEventListener('click', delayed, true);
+  document.addEventListener('keydown', delayed, true);
 })();
 </script>
 
