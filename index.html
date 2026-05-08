@@ -2,33 +2,9 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" id="viewport-meta" content="width=1460, minimum-scale=0.1, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
+<meta name="viewport" id="viewport-meta" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <meta name="format-detection" content="telephone=no, email=no, address=no" />
-<script>
-/* 첫 로딩 시 화면 폭에 맞춰 initial-scale을 동적 계산해 페이지 전체가 한눈에 들어오게 함.
-   width=1460 디자인 기준, 모든 모바일/태블릿(iOS·Android·KakaoTalk WebView 포함) 대응. */
-(function(){
-  try{
-    var DESIGN_W = 1460;
-    var sw = (window.screen && window.screen.width) ? window.screen.width : window.innerWidth;
-    var vw = window.innerWidth || sw;
-    var base = Math.max(sw || 0, vw || 0) || DESIGN_W;
-    if(base < DESIGN_W){
-      var scale = base / DESIGN_W;
-      if(scale < 0.18) scale = 0.18;
-      var meta = document.getElementById('viewport-meta');
-      if(meta){
-        meta.setAttribute('content',
-          'width=' + DESIGN_W +
-          ', initial-scale=' + scale.toFixed(3) +
-          ', minimum-scale=' + Math.max(0.1, scale * 0.7).toFixed(3) +
-          ', maximum-scale=5.0, user-scalable=yes, viewport-fit=cover'
-        );
-      }
-    }
-  }catch(e){ /* 실패해도 페이지는 정상 동작 */ }
-})();
-</script>
+<script>/* mobile reviewed: fixed device-width viewport; no desktop-width forced scaling */</script>
 <title>ACE · AI링커 설명회</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -2140,6 +2116,174 @@ html, body,
   .detail-stage .slide-no{align-self:flex-end!important;margin-top:-28px!important;}
 }
 
+
+
+/* =========================================================
+   R.200 REVIEWED MOBILE LOCK PATCH
+   검토 결과 원인:
+   1) width=1460 viewport 강제 스케일링
+   2) fitActiveSlide()의 JS scale()
+   3) 슬라이드 내부 inline grid/height/overflow:hidden
+   4) 후행 CSS !important가 모바일 CSS를 덮어씀
+   처리 방향: 모바일에서는 PPT 비율 슬라이드가 아니라 화면폭 1열 스크롤 문서로 전환
+   ========================================================= */
+@media (max-width: 920px){
+  html, body{
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin:0!important;
+    overflow:hidden!important;
+    -webkit-text-size-adjust:100%!important;
+    text-size-adjust:100%!important;
+    overscroll-behavior:none!important;
+  }
+  body{background-size:92px 100%, 100% 92px!important;}
+
+  .stage{width:100vw!important;height:100dvh!important;overflow:hidden!important;}
+  .shell{width:calc(100vw - 24px)!important;max-width:none!important;height:100%!important;min-width:0!important;}
+  .topbar{width:calc(100vw - 24px)!important;left:12px!important;right:12px!important;transform:none!important;}
+  .top-right{display:none!important;}
+  .brand-chip{max-width:100%!important;padding:10px 14px!important;}
+  .brand-copy strong{font-size:11px!important;white-space:normal!important;line-height:1.15!important;}
+  .brand-copy span{font-size:10px!important;white-space:normal!important;}
+
+  /* 첫 화면도 겹치지 않게 세로형 */
+  .hero-layer{overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;padding-bottom:48px!important;}
+  .hero-copy{position:relative!important;left:auto!important;top:auto!important;transform:none!important;width:100%!important;padding-top:112px!important;}
+  .hero-title{font-size:clamp(42px,14.4vw,64px)!important;line-height:1.02!important;letter-spacing:-.068em!important;}
+  .hero-desc{font-size:clamp(16px,4.3vw,19px)!important;line-height:1.5!important;margin-top:22px!important;}
+  .hero-card{position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;transform:none!important;width:100%!important;height:auto!important;min-height:250px!important;margin:26px 0 56px!important;padding:25px!important;}
+  .hero-card strong{font-size:clamp(32px,10.4vw,48px)!important;line-height:1.04!important;}
+
+  /* 상세 전체 구조 */
+  .detail-root.open,.detail-root.visible{overflow:hidden!important;}
+  .detail-stage{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;overflow:hidden!important;}
+  .detail-topbar{position:fixed!important;left:12px!important;right:12px!important;top:calc(10px + env(safe-area-inset-top,0px))!important;width:auto!important;transform:none!important;z-index:200!important;display:flex!important;justify-content:space-between!important;align-items:center!important;padding:0!important;gap:10px!important;}
+  .detail-center{display:none!important;}
+  .detail-btn{min-height:48px!important;padding:12px 16px!important;border-radius:999px!important;font-size:17px!important;line-height:1!important;white-space:nowrap!important;}
+
+  .detail-deck-wrap{position:fixed!important;inset:0!important;display:block!important;overflow:hidden!important;padding:calc(76px + env(safe-area-inset-top,0px)) 10px calc(106px + env(safe-area-inset-bottom,0px))!important;}
+  .detail-deck{position:relative!important;width:100%!important;height:100%!important;min-width:0!important;max-width:none!important;min-height:0!important;max-height:none!important;aspect-ratio:auto!important;overflow:hidden!important;border-radius:20px!important;filter:none!important;}
+  .detail-slide{position:absolute!important;inset:0!important;display:block!important;place-items:unset!important;opacity:0!important;pointer-events:none!important;overflow:hidden!important;transform:translateX(105%)!important;transition:transform .22s ease, opacity .22s ease!important;}
+  .detail-slide.active{opacity:1!important;pointer-events:auto!important;transform:translateX(0)!important;}
+  .detail-slide.prev{transform:translateX(-105%)!important;}
+
+  /* 캔버스를 모바일 문서로 전환 */
+  .detail-stage .detail-slide.active .canvas,
+  .detail-stage .detail-slide.active .hero-bg,
+  .detail-stage .detail-slide.active.ceo-message-slide .canvas,
+  .detail-stage .detail-slide.active.ace-meeting-slide .canvas{
+    position:relative!important;
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    aspect-ratio:auto!important;
+    transform:none!important;
+    transform-origin:initial!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior:contain!important;
+    border-radius:20px!important;
+    padding:32px 18px 132px!important;
+    box-shadow:none!important;
+    contain:layout paint!important;
+  }
+  .detail-stage .detail-slide.active.chapter-slide .canvas,
+  .detail-stage .detail-slide.active.chapter-slide .hero-bg{padding:86px 22px 132px!important;}
+  .detail-stage .detail-slide.active .canvas:before{height:8px!important;width:100%!important;left:0!important;top:0!important;bottom:auto!important;}
+  .detail-stage .detail-slide.active .canvas:after{display:none!important;content:none!important;}
+
+  /* 모든 내부 요소의 가로 넘침 차단 */
+  .detail-stage .detail-slide.active .canvas *,
+  .detail-stage .detail-slide.active .hero-bg *{
+    box-sizing:border-box!important;
+    max-width:100%!important;
+    min-width:0!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+    word-break:keep-all!important;
+  }
+  .detail-stage .detail-slide.active .topline{display:block!important;margin:0 0 18px!important;padding-top:4px!important;}
+  .detail-stage .detail-slide.active .slide-no{position:absolute!important;top:18px!important;right:18px!important;z-index:10!important;min-width:0!important;padding:7px 10px!important;font-size:12px!important;line-height:1!important;}
+  .detail-stage .detail-slide.active .kicker{width:max-content!important;max-width:calc(100% - 82px)!important;margin:0 0 16px!important;padding:7px 10px!important;font-size:11.5px!important;line-height:1.18!important;letter-spacing:.08em!important;}
+  .detail-stage .detail-slide.active h1,
+  .detail-stage .detail-slide.active.chapter-slide h1{font-size:clamp(30px,9vw,42px)!important;line-height:1.08!important;letter-spacing:-.065em!important;margin:0!important;}
+  .detail-stage .detail-slide.active h2{font-size:clamp(26px,7.4vw,34px)!important;line-height:1.13!important;letter-spacing:-.055em!important;margin:0 0 16px!important;}
+  .detail-stage .detail-slide.active h3{font-size:clamp(20px,5.2vw,25px)!important;line-height:1.25!important;letter-spacing:-.045em!important;}
+  .detail-stage .detail-slide.active .lead,
+  .detail-stage .detail-slide.active .sub{font-size:clamp(15px,4.1vw,18px)!important;line-height:1.55!important;}
+  .detail-stage .detail-slide.active p,
+  .detail-stage .detail-slide.active li,
+  .detail-stage .detail-slide.active td,
+  .detail-stage .detail-slide.active th,
+  .detail-stage .detail-slide.active .check,
+  .detail-stage .detail-slide.active .a{font-size:clamp(14px,3.75vw,16.5px)!important;line-height:1.5!important;}
+  .detail-stage .detail-slide.active .muted,
+  .detail-stage .detail-slide.active .mini{font-size:clamp(13px,3.4vw,15px)!important;line-height:1.48!important;}
+  .detail-stage .detail-slide.active .pill,
+  .detail-stage .detail-slide.active .tag{width:max-content!important;max-width:100%!important;font-size:12px!important;line-height:1.18!important;padding:7px 10px!important;}
+
+  /* inline style로 박힌 모든 다열 grid/flex/고정 높이 제거 */
+  .detail-stage .detail-slide.active .row,
+  .detail-stage .detail-slide.active .row3,
+  .detail-stage .detail-slide.active .row4,
+  .detail-stage .detail-slide.active .reward,
+  .detail-stage .detail-slide.active .qa,
+  .detail-stage .detail-slide.active .flow,
+  .detail-stage .detail-slide.active .ceo-message-layout,
+  .detail-stage .detail-slide.active [style*="grid-template-columns"]{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:auto!important;gap:14px!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;margin-top:16px!important;align-items:stretch!important;}
+  .detail-stage .detail-slide.active [style*="display:flex"]{flex-wrap:wrap!important;align-items:flex-start!important;}
+  .detail-stage .detail-slide.active .card,
+  .detail-stage .detail-slide.active .month,
+  .detail-stage .detail-slide.active .node,
+  .detail-stage .detail-slide.active .qcard,
+  .detail-stage .detail-slide.active .mock,
+  .detail-stage .detail-slide.active .case,
+  .detail-stage .detail-slide.active .tbox,
+  .detail-stage .detail-slide.active [style*="height:"]{width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;}
+  .detail-stage .detail-slide.active .card,
+  .detail-stage .detail-slide.active .month,
+  .detail-stage .detail-slide.active .node,
+  .detail-stage .detail-slide.active .qcard{padding:18px!important;border-radius:18px!important;}
+  .detail-stage .detail-slide.active .arrow{display:none!important;}
+  .detail-stage .detail-slide.active .checklist{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;height:auto!important;min-height:0!important;margin-top:12px!important;}
+  .detail-stage .detail-slide.active .check{display:grid!important;grid-template-columns:32px minmax(0,1fr)!important;align-items:flex-start!important;gap:10px!important;width:100%!important;height:auto!important;min-height:0!important;padding:14px!important;overflow:visible!important;}
+  .detail-stage .detail-slide.active .mark,
+  .detail-stage .detail-slide.active .badge{width:28px!important;height:28px!important;font-size:14px!important;flex:0 0 auto!important;}
+
+  /* 표는 반드시 세로 카드형 */
+  .detail-stage .detail-slide.active table.table,
+  .detail-stage .detail-slide.active table.table thead,
+  .detail-stage .detail-slide.active table.table tbody,
+  .detail-stage .detail-slide.active table.table tr,
+  .detail-stage .detail-slide.active table.table th,
+  .detail-stage .detail-slide.active table.table td{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;height:auto!important;table-layout:auto!important;white-space:normal!important;}
+  .detail-stage .detail-slide.active table.table{border:0!important;box-shadow:none!important;border-radius:0!important;background:transparent!important;margin-top:12px!important;overflow:visible!important;}
+  .detail-stage .detail-slide.active table.table thead{display:none!important;}
+  .detail-stage .detail-slide.active table.table tr{margin:0 0 10px!important;border:1px solid rgba(0,0,0,.08)!important;border-radius:16px!important;overflow:hidden!important;background:rgba(255,255,255,.88)!important;}
+  .detail-stage .detail-slide.active table.table td,
+  .detail-stage .detail-slide.active table.table th{border:0!important;padding:12px 14px!important;text-align:left!important;vertical-align:top!important;}
+  .detail-stage .detail-slide.active table.table td:first-child{background:var(--detail-tint)!important;font-weight:900!important;border-bottom:1px solid rgba(0,0,0,.07)!important;}
+
+  .detail-stage .detail-slide.active .ceo-message-layout{height:auto!important;min-height:0!important;}
+  .detail-stage .detail-slide.active .ceo-message-card,
+  .detail-stage .detail-slide.active .ceo-message-scroll{height:auto!important;max-height:none!important;min-height:0!important;overflow:visible!important;}
+  .detail-stage .detail-slide.active .ceo-message-scroll p{font-size:14.5px!important;line-height:1.62!important;}
+
+  .detail-nav{position:fixed!important;left:10px!important;right:10px!important;bottom:calc(10px + env(safe-area-inset-bottom,0px))!important;transform:none!important;width:auto!important;max-width:none!important;z-index:200!important;display:flex!important;justify-content:space-between!important;align-items:center!important;gap:8px!important;padding:8px 10px!important;border-radius:26px!important;}
+  .detail-nav-btn{flex:0 0 auto!important;min-width:86px!important;padding:12px 16px!important;border-radius:999px!important;font-size:16px!important;line-height:1!important;}
+  .detail-progress{flex:1 1 auto!important;min-width:0!important;justify-content:center!important;gap:8px!important;}
+  .detail-progress-bar{width:min(112px,26vw)!important;height:8px!important;}
+  .detail-progress span{min-width:44px!important;font-size:17px!important;line-height:1!important;}
+}
+
 </style>
 </head>
 <body>
@@ -2709,12 +2853,13 @@ detailNext.addEventListener('click', ()=>moveDetail(1));
     var active = document.querySelector('.detail-slide.active .canvas');
     if(!active) return;
     active.style.transform = '';
-    active.style.transformOrigin = 'top center';
-    var available = active.clientHeight;
-    var needed = active.scrollHeight;
-    if(needed > available + 6){
-      var scale = Math.max(0.92, Math.min(1, available / needed));
-      active.style.transform = 'scale(' + scale + ')';
+    active.style.transformOrigin = '';
+    // 모바일에서는 캔버스를 축소하지 않고 내부 스크롤로 처리한다.
+    if(window.matchMedia && window.matchMedia('(max-width: 920px)').matches){
+      active.style.setProperty('transform','none','important');
+      active.style.setProperty('overflow-y','auto','important');
+      active.style.setProperty('overflow-x','hidden','important');
+      return;
     }
   }
   window.addEventListener('load', fitActiveSlide);
@@ -2747,6 +2892,86 @@ detailNext.addEventListener('click', ()=>moveDetail(1));
   }
   window.addEventListener('resize', handleFoldModeChange);
   window.addEventListener('orientationchange', handleFoldModeChange);
+})();
+</script>
+
+
+<script>
+/* R.200 mobile runtime hardener: executed after slide render and after every navigation. */
+(function(){
+  function isMobile(){ return window.matchMedia && window.matchMedia('(max-width: 920px)').matches; }
+  function setViewport(){
+    var meta = document.getElementById('viewport-meta') || document.querySelector('meta[name="viewport"]');
+    if(meta) meta.setAttribute('content','width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+  }
+  function harden(){
+    setViewport();
+    if(!isMobile()) return;
+    document.documentElement.scrollLeft = 0;
+    document.body.scrollLeft = 0;
+    var active = document.querySelector('.detail-slide.active');
+    if(!active) return;
+    var canvas = active.querySelector('.canvas');
+    if(!canvas) return;
+    [document.documentElement, document.body].forEach(function(el){
+      el.style.setProperty('overflow','hidden','important');
+      el.style.setProperty('width','100%','important');
+      el.style.setProperty('height','100%','important');
+    });
+    canvas.style.setProperty('transform','none','important');
+    canvas.style.setProperty('overflow-y','auto','important');
+    canvas.style.setProperty('overflow-x','hidden','important');
+    canvas.style.setProperty('height','100%','important');
+    canvas.style.setProperty('width','100%','important');
+    canvas.scrollLeft = 0;
+
+    active.querySelectorAll('*').forEach(function(el){
+      el.style.setProperty('box-sizing','border-box','important');
+      el.style.setProperty('min-width','0','important');
+      el.style.setProperty('max-width','100%','important');
+      el.style.setProperty('white-space','normal','important');
+      el.style.setProperty('overflow-wrap','anywhere','important');
+      var raw = el.getAttribute('style') || '';
+      var tag = el.tagName ? el.tagName.toLowerCase() : '';
+      if(el !== canvas && /grid-template-columns\s*:/i.test(raw)){
+        el.style.setProperty('display','grid','important');
+        el.style.setProperty('grid-template-columns','1fr','important');
+        el.style.setProperty('grid-template-rows','auto','important');
+        el.style.setProperty('gap','14px','important');
+        el.style.setProperty('width','100%','important');
+      }
+      if(el !== canvas && /display\s*:\s*flex/i.test(raw)){
+        el.style.setProperty('flex-wrap','wrap','important');
+        el.style.setProperty('align-items','flex-start','important');
+      }
+      if(el !== canvas && /(?:^|;|\s)(height|min-height|max-height)\s*:/i.test(raw)){
+        el.style.setProperty('height','auto','important');
+        el.style.setProperty('min-height','0','important');
+        el.style.setProperty('max-height','none','important');
+      }
+      if(el !== canvas && /overflow\s*:\s*hidden/i.test(raw)){
+        el.style.setProperty('overflow','visible','important');
+      }
+      if(tag === 'table' || tag === 'thead' || tag === 'tbody' || tag === 'tr' || tag === 'td' || tag === 'th'){
+        el.style.setProperty('display','block','important');
+        el.style.setProperty('width','100%','important');
+        el.style.setProperty('min-width','0','important');
+        el.style.setProperty('max-width','100%','important');
+        el.style.setProperty('height','auto','important');
+        el.style.setProperty('white-space','normal','important');
+      }
+    });
+  }
+  function schedule(){ setViewport(); harden(); setTimeout(harden, 30); setTimeout(harden, 120); setTimeout(harden, 320); }
+  window.normalizeMobileDetailLayout = harden;
+  window.addEventListener('DOMContentLoaded', schedule);
+  window.addEventListener('load', schedule);
+  window.addEventListener('resize', schedule);
+  window.addEventListener('orientationchange', schedule);
+  document.addEventListener('click', schedule, true);
+  document.addEventListener('keydown', schedule, true);
+  var target = document.getElementById('detailDeck');
+  if(target && window.MutationObserver){ new MutationObserver(schedule).observe(target,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style']}); }
 })();
 </script>
 
