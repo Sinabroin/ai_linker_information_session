@@ -2284,6 +2284,43 @@ html, body,
   .detail-progress span{min-width:44px!important;font-size:17px!important;line-height:1!important;}
 }
 
+
+
+/* =========================================================
+   R.201 MOBILE HERO HINT FIX
+   첫 화면의 "위로 스와이프..." 안내문이 파란 hero-card 위에
+   absolute로 겹쳐 보이는 문제만 수정.
+   안내문을 hero-card 아래의 일반 흐름 요소로 전환한다.
+   ========================================================= */
+@media (max-width: 920px){
+  .hero-layer .hero-card{
+    margin-bottom:22px!important;
+  }
+  .hero-layer .mobile-hint{
+    display:block!important;
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:auto!important;
+    width:fit-content!important;
+    max-width:calc(100% - 24px)!important;
+    margin:0 auto 34px!important;
+    padding:9px 13px!important;
+    border-radius:999px!important;
+    background:rgba(255,255,255,.82)!important;
+    border:1px solid rgba(0,0,0,.07)!important;
+    box-shadow:0 8px 22px rgba(0,0,0,.06)!important;
+    color:#5d6678!important;
+    font-size:12px!important;
+    line-height:1.35!important;
+    font-weight:800!important;
+    text-align:center!important;
+    z-index:3!important;
+    pointer-events:none!important;
+  }
+}
+
 </style>
 </head>
 <body>
